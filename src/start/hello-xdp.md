@@ -14,7 +14,7 @@ We must first write the eBPF component of our program.
 The logic for this program is located in `myapp-ebpf/src/main.rs` and currently looks like this:
 
 ```rust,ignore
-{{#rustdoc_include ../../examples/myapp-00/myapp-ebpf/src/main.rs:all}}
+{{#rustdoc_include ../../examples/myapp-01/myapp-ebpf/src/main.rs:all}}
 ```
 
 - `#![no_std]` is required since we cannot use the standard library.
@@ -27,13 +27,13 @@ Let's look at some of its details.
 First we make some `use` declarations:
 
 ```rust,ignore
-{{#rustdoc_include ../../examples/myapp-00/myapp-ebpf/src/main.rs:use }}
+{{#rustdoc_include ../../examples/myapp-01/myapp-ebpf/src/main.rs:use }}
 ```
 
 Then our application logic:
 
 ```rust,ignore
-{{#rustdoc_include ../../examples/myapp-00/myapp-ebpf/src/main.rs:main }}
+{{#rustdoc_include ../../examples/myapp-01/myapp-ebpf/src/main.rs:main }}
 ```
 
 - `#[xdp(name="myapp")]` indicates that this function is an XDP program.
@@ -75,27 +75,27 @@ Fortunately, we have a generated program ready in `myapp/src/main.rs` which is g
 The generated application has the following content:
 
 ```rust,ignore
-{{#rustdoc_include ../../examples/myapp-00/myapp/src/main.rs:all }}
+{{#rustdoc_include ../../examples/myapp-01/myapp/src/main.rs:all }}
 ```
 
 Let's look at the details of this program.
 
 There is a dependency on `ctrlc` added to `myapp/Cargo.toml`:
 ```toml
-{{#include ../../examples/myapp-00/myapp/Cargo.toml:11}}
+{{#include ../../examples/myapp-01/myapp/Cargo.toml:11}}
 ```
 
 The following `use` declarations are added at the top of the `myapp/src/main.rs`:
 
 ```rust,ignore
-{{#rustdoc_include ../../examples/myapp-00/myapp/src/main.rs:use }}
+{{#rustdoc_include ../../examples/myapp-01/myapp/src/main.rs:use }}
 ```
 
 
 `try_main` function loads our program:
 
 ```rust,ignore
-{{#rustdoc_include ../../examples/myapp-00/myapp/src/main.rs:try_main }}
+{{#rustdoc_include ../../examples/myapp-01/myapp/src/main.rs:try_main }}
 ```
 
 
