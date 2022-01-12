@@ -1,3 +1,4 @@
+// ANCHOR: all
 // ANCHOR: use
 use aya::{Bpf, include_bytes_aligned};
 use aya::programs::{Xdp, XdpFlags};
@@ -58,3 +59,4 @@ fn try_main() -> Result<(), anyhow::Error> {
     Ok(())
 }
 // ANCHOR_END: try_main
+// ANCHOR_END: all

@@ -14,7 +14,7 @@ We must first write the eBPF component of our program.
 The logic for this program is located in `myapp-ebpf/src/main.rs` and currently looks like this:
 
 ```rust,ignore
-{{#rustdoc_include ../../examples/myapp-00/myapp-ebpf/src/main.rs}}
+{{#rustdoc_include ../../examples/myapp-00/myapp-ebpf/src/main.rs:all}}
 ```
 
 - `#![no_std]` is required since we cannot use the standard library.
@@ -24,7 +24,7 @@ The logic for this program is located in `myapp-ebpf/src/main.rs` and currently 
 This is a minimal generated XDP program that permits all traffic.
 
 Let's look at some of its details.
-First make some `use` declarations:
+First we make some `use` declarations:
 
 ```rust,ignore
 {{#rustdoc_include ../../examples/myapp-00/myapp-ebpf/src/main.rs:use }}
@@ -36,11 +36,11 @@ Then our application logic:
 {{#rustdoc_include ../../examples/myapp-00/myapp-ebpf/src/main.rs:main }}
 ```
 
-- `#[xdp(name="myapp")]` indicates that this function is an XDP program
-- The `try_myapp` function returns a Result that currenlty permits all traffic
+- `#[xdp(name="myapp")]` indicates that this function is an XDP program.
+- The `try_myapp` function returns a Result that currenlty permits all traffic.
 - The `myapp` program calls `try_myapp` and handles any errors by returning `XDP_ABORTED`, which will drop the packet and raise a tracepoint exception.
 
-Now we can compile this using `cargo xtask build-ebpf`
+Now we can compile this using `cargo xtask build-ebpf`.
 
 ### Verifying The Program
 
@@ -75,7 +75,7 @@ Fortunately, we have a generated program ready in `myapp/src/main.rs` which is g
 The generated application has the following content:
 
 ```rust,ignore
-{{#rustdoc_include ../../examples/myapp-00/myapp/src/main.rs }}
+{{#rustdoc_include ../../examples/myapp-00/myapp/src/main.rs:all }}
 ```
 
 Let's look at the details of this program.

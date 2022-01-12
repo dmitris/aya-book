@@ -1,3 +1,4 @@
+// ANCHOR: all
 #![no_std]
 #![no_main]
 
@@ -27,3 +28,4 @@ unsafe fn try_myapp(_ctx: XdpContext) -> Result<u32, u32> {
 fn panic(_info: &core::panic::PanicInfo) -> ! {
     unsafe { core::hint::unreachable_unchecked() }
 }
+// ANCHOR_END: all
