@@ -1,6 +1,12 @@
 use std::net::{self, Ipv4Addr};
 
-use aya::{include_bytes_aligned, Bpf, programs::{tc, SchedClassifier, TcAttachType}, maps::{perf::AsyncPerfEventArray, HashMap}, util::online_cpus};
+use aya::{
+    include_bytes_aligned,
+    maps::{perf::AsyncPerfEventArray, HashMap},
+    programs::{tc, SchedClassifier, TcAttachType},
+    util::online_cpus,
+    Bpf,
+};
 use bytes::BytesMut;
 use clap::Parser;
 use log::info;
@@ -35,14 +41,15 @@ async fn main() -> Result<(), anyhow::Error> {
     // error adding clsact to the interface if it is already added is harmless
     // the full cleanup can be done with 'sudo tc qdisc del dev eth0 clsact'.
     let _ = tc::qdisc_add_clsact(&opt.iface);
-    let program: &mut SchedClassifier = bpf.program_mut("tc_egress").unwrap().try_into()?;
+    let program: &mut SchedClassifier =
+        bpf.program_mut("tc_egress").unwrap().try_into()?;
     program.load()?;
     program.attach(&opt.iface, TcAttachType::Egress)?;
 
     // (1)
     let mut blocklist: HashMap<_, u32, u32> =
         HashMap::try_from(bpf.map_mut("BLOCKLIST")?)?;
-    
+
     // (2)
     let block_addr: u32 = Ipv4Addr::new(1, 1, 1, 1).try_into()?;
 
@@ -50,26 +57,13 @@ async fn main() -> Result<(), anyhow::Error> {
     blocklist.insert(block_addr, 0, 0)?;
 
     let mut perf_array = AsyncPerfEventArray::try_from(bpf.map_mut("EVENTS")?)?;
-
+    let mut perf_array2 =
+        AsyncPerfEventArray::try_from(bpf.map_mut("EVENTS2")?)?;
     for cpu_id in online_cpus()? {
         let mut buf = perf_array.open(cpu_id, None)?;
-
-        task::spawn(async move {
-            let mut buffers = (0..10)
-                .map(|_| BytesMut::with_capacity(1024))
-                .collect::<Vec<_>>();
-
-            loop {
-                let events = buf.read_events(&mut buffers).await.unwrap();
-                for i in 0..events.read {
-                    let buf = &mut buffers[i];
-                    let ptr = buf.as_ptr() as *const PacketLog;
-                    let data = unsafe { ptr.read_unaligned() };
-                    let src_addr = net::Ipv4Addr::from(data.ipv4_address);
-                    info!("LOG: SRC {}, ACTION {}", src_addr, data.action);
-                }
-            }
-        });
+        let mut buf2 = perf_array2.open(cpu_id, None)?;
+        let _h1 = task::spawn(process(buf));
+        let _h2 = task::spawn(process(buf2));
     }
 
     info!("Waiting for Ctrl-C...");
@@ -77,4 +71,21 @@ async fn main() -> Result<(), anyhow::Error> {
     info!("Exiting...");
 
     Ok(())
+}
+
+async fn process<T>(buf: AsyncPerfEventArray<T>) {
+    let mut buffers = (0..10)
+        .map(|_| BytesMut::with_capacity(1024))
+        .collect::<Vec<_>>();
+
+    loop {
+        let events = buf.read_events(&mut buffers).await.unwrap();
+        for i in 0..events.read {
+            let buf = &mut buffers[i];
+            let ptr = buf.as_ptr() as *const PacketLog;
+            let data = unsafe { ptr.read_unaligned() };
+            let src_addr = net::Ipv4Addr::from(data.ipv4_address);
+            info!("LOG: SRC {}, ACTION {}", src_addr, data.action);
+        }
+    }
 }

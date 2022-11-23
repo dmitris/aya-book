@@ -1,12 +1,12 @@
-use aya::{include_bytes_aligned, Bpf};
 use anyhow::Context;
-use aya::programs::{Xdp, XdpFlags};
 use aya::maps::{perf::AsyncPerfEventArray, HashMap};
+use aya::programs::{Xdp, XdpFlags};
 use aya::util::online_cpus;
+use aya::{include_bytes_aligned, Bpf};
 use bytes::BytesMut;
-use std::net::{self, Ipv4Addr};
 use clap::Parser;
 use log::info;
+use std::net::{self, Ipv4Addr};
 use tokio::{signal, task};
 
 use myapp_common::PacketLog;
