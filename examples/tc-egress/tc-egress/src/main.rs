@@ -42,8 +42,16 @@ async fn main() -> Result<(), anyhow::Error> {
     // error adding clsact to the interface if it is already added is harmless
     // the full cleanup can be done with 'sudo tc qdisc del dev eth0 clsact'.
     let _ = tc::qdisc_add_clsact(&opt.iface);
+    // this is just for information and debugging - show the found programs.
+    for (name, program) in bpf.programs() {
+        println!(
+            "[INFO] found program `{}` of type `{:?}`",
+            name,
+            program.prog_type()
+        );
+    }
     let program: &mut SchedClassifier =
-        bpf.program_mut("tc_egress").unwrap().try_into()?;
+        bpf.program_mut("foobar").unwrap().try_into()?;
     program.load()?;
     program.attach(&opt.iface, TcAttachType::Egress)?;
 

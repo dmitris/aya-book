@@ -17,7 +17,7 @@ use network_types::{
 static BLOCKLIST: HashMap<u32, u32> = HashMap::with_max_entries(1024, 0);
 
 #[classifier]
-pub fn tc_egress(ctx: TcContext) -> i32 {
+pub fn foobar(ctx: TcContext) -> i32 {
     match try_tc_egress(ctx) {
         Ok(ret) => ret,
         Err(_) => TC_ACT_SHOT,
